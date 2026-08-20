@@ -18,9 +18,10 @@ dataset/
 
 # Model Weights & Runs
 runs/
+/yolo*.pt
 weights/*.pt
+!weights/best.pt
 !weights/.gitkeep
-*.pt
 *.onnx
 *.engine
 
