@@ -1,0 +1,36 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Datasets (Prevent uploading large image files)
+dataset/
+*.zip
+*.tar
+*.gz
+
+# Model Weights & Runs
+runs/
+weights/*.pt
+!weights/.gitkeep
+*.pt
+*.onnx
+*.engine
+
+# Snapshots & Outputs
+snapshots/*.jpg
+snapshots/*.png
+!snapshots/.gitkeep
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
