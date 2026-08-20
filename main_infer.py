@@ -45,16 +45,46 @@ def run_image_inference(detector: HandDetector, visualizer: HandVisualizer, imag
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
+def open_camera(index: int):
+    """Attempts to open a camera using DirectShow, MSMF, or default backends."""
+    backends = [
+        ("CAP_DSHOW", cv2.CAP_DSHOW),
+        ("CAP_MSMF", cv2.CAP_MSMF),
+        ("DEFAULT", cv2.CAP_ANY)
+    ]
+    for name, backend in backends:
+        cap = cv2.VideoCapture(index, backend)
+        if cap.isOpened():
+            print(f"[Camera] Successfully opened camera index {index} using backend {name}")
+            return cap
+    return None
+
 def run_stream_inference(detector: HandDetector, visualizer: HandVisualizer, source: str):
     """Runs real-time inference on webcam stream or video file."""
     # Determine camera index vs video file
     is_webcam = source.isdigit()
-    cam_index = int(source) if is_webcam else 0
-
-    cap = cv2.VideoCapture(cam_index if is_webcam else source)
-    if not cap.isOpened():
-        print(f"[Error] Failed to open video source: {source}")
-        return
+    
+    if is_webcam:
+        cam_index = int(source)
+        cap = open_camera(cam_index)
+        if cap is None:
+            # Probe other indices
+            for alt_idx in [1, 2, 0]:
+                if alt_idx != cam_index:
+                    cap = open_camera(alt_idx)
+                    if cap is not None:
+                        cam_index = alt_idx
+                        break
+        if cap is None:
+            print(f"\n[Error] No available webcam found on indices (0, 1, 2).")
+            print("[Tip] If you don't have a physical webcam connected, you can test images using:")
+            print("      python main_infer.py --source dataset/test/images/<any_image>.jpg\n")
+            return
+    else:
+        cap = cv2.VideoCapture(source)
+        if not cap.isOpened():
+            print(f"[Error] Failed to open video source: {source}")
+            return
 
     # Attempt to set HD resolution for webcam
     if is_webcam:
